@@ -44,7 +44,7 @@ int main()
 		lifeforms = evaluateWorld(rows, cols, world);
 		printWorld(rows, cols, world, counter);
         refresh();
-        usleep(10000);
+        //usleep(10000);
 		
 		if (lifeforms == lifeformBuffer)
         {
@@ -65,7 +65,7 @@ int main()
 				lifeformBuffer = -1;
                 time = 0;
 				//exit(0);
-                usleep(500000);
+                //usleep(500000);
                 clear();
 			}
         } else {
