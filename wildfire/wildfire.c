@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <windows.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
+#include <ncurses.h>
 
 void populateWorld(float percent, int rows, int cols, int world[rows][cols]);
 void printWorld(int rows, int cols, int world[rows][cols], int counter);
@@ -24,6 +25,16 @@ int main()
     int world[rows][cols];
     int time, lifeforms, lifeformBuffer = -1, counter = 0;
 
+    // Initialize ncurses.
+    initscr();
+    printw("Wildfire");
+    refresh();
+
+    // Initialize colors
+    start_color();
+    init_pair(1, COLOR_GREEN, COLOR_BLACK);
+    init_pair(2, COLOR_RED, COLOR_BLACK);
+
     populateWorld(percent, rows, cols, world);
 	
 	// Set one position on fire.
@@ -32,9 +43,8 @@ int main()
     for (time=0; time > -1; time++) {
 		lifeforms = evaluateWorld(rows, cols, world);
 		printWorld(rows, cols, world, counter);
-		printf("%f, %d\n", bestPercent, bestRun);
-
-		Sleep(100);
+        refresh();
+        usleep(10000);
 		
 		if (lifeforms == lifeformBuffer)
         {
@@ -55,6 +65,8 @@ int main()
 				lifeformBuffer = -1;
                 time = 0;
 				//exit(0);
+                usleep(500000);
+                clear();
 			}
         } else {
             lifeformBuffer = lifeforms;
@@ -128,22 +140,19 @@ void populateWorld(float percent, int rows, int cols, int world[rows][cols])
 
 
 void printWorld(int rows, int cols, int world[rows][cols], int counter) {
-    printf("\e[1;1H\e[2J");
     int i, j;
     int lifeforms = 0;
     for (i = 0; i < rows; i++) {
         for (j = 0; j < cols; j++){
             if (world[i][j] == 1) {
                 lifeforms += 1;
-                printf("\x1b[32m#");
-            }else if (world[i][j] == 0){
-                printf(" ");
-            } else {
-                printf("\x1b[31m0");
+                attron(COLOR_PAIR(1));
+                mvprintw(i,j,"#");
+            }else if (world[i][j] == 2){
+                attron(COLOR_PAIR(2));
+                mvprintw(i,j,"O");
             }
         }
-        printf("\n");
     }
-    printf("\x1b[0m==== %d Lifeforms -- %d \n",lifeforms, counter);
    
 }
